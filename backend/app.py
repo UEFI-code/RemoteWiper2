@@ -1,6 +1,8 @@
 import flask
 import os
 
+MAGIC_WORD = "WipeAllDataNow"
+
 app = flask.Flask(__name__)
 
 @app.route('/status', methods=['GET'])
@@ -20,9 +22,9 @@ def command():
         state += 1
         fp.write(str(state))
         fp.close()
-        return flask.jsonify({'wipe': True}), 200
+        return MAGIC_WORD, 200
     except:
-        return flask.jsonify({'wipe': False}), 200
+        return "", 200
     
 @app.route('/wipe_now', methods=['GET'])
 def wipe_now():
